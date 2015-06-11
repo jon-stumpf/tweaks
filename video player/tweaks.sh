@@ -1,6 +1,8 @@
 #! /bin/sh
 
-if [ -d "/mnt/sdb1/check" ]; then
+if [ -d "/mnt/sda1/check" ]; then
+  gst-launch filesrc location=/mnt/sda1/test.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! vpudec ! mfw_v4lsink demux. ! queue max-size-buffers=0 max-size-time=0 ! beepdec ! audioconvert ! 'audio/x-raw-int, channels=2' ! alsasink
+elif [ -d "/mnt/sdb1/check" ]; then
   gst-launch filesrc location=/mnt/sdb1/test.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! vpudec ! mfw_v4lsink demux. ! queue max-size-buffers=0 max-size-time=0 ! beepdec ! audioconvert ! 'audio/x-raw-int, channels=2' ! alsasink
 elif  [ -d "/mnt/sdc1/check" ]; then
   gst-launch filesrc location=/mnt/sdc1/test.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! vpudec ! mfw_v4lsink demux. ! queue max-size-buffers=0 max-size-time=0 ! beepdec ! audioconvert ! 'audio/x-raw-int, channels=2' ! alsasink
