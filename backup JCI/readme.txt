@@ -1,0 +1,1 @@
+Backup the complete jci folder of infotainment system into the backup folder of the usb
