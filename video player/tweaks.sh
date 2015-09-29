@@ -1,19 +1,23 @@
 #! /bin/sh
-MYDIR=$(dirname $(readlink -f $0))
-TIMESTAMP=$(date "+%m%d%Y-%H%M%S")
-LOGFILE=${MYDIR}/${TIMESTAMP}.txt
 
-echo "Checking ${MYDIR} for test.mp4" >> ${LOGFILE}
-if [ -e "${MYDIR}/test.mp4" ]; then
-  echo "Found test.mp4, attempting to play file" >> ${LOGFILE}
-  gst-launch filesrc location=${MYDIR}/test.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! vpudec ! mfw_v4lsink demux. ! queue max-size-buffers=0 max-size-time=0 ! beepdec ! audioconvert ! 'audio/x-raw-int, channels=2' ! alsasink
+if [ -d "/mnt/sda1/check" ]; then
+  gst-launch filesrc location=/mnt/sda1/test.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! vpudec ! mfw_v4lsink demux. ! queue max-size-buffers=0 max-size-time=0 ! beepdec ! audioconvert ! 'audio/x-raw-int, channels=2' ! alsasink
+elif [ -d "/mnt/sdb1/check" ]; then
+  gst-launch filesrc location=/mnt/sdb1/test.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! vpudec ! mfw_v4lsink demux. ! queue max-size-buffers=0 max-size-time=0 ! beepdec ! audioconvert ! 'audio/x-raw-int, channels=2' ! alsasink
+elif  [ -d "/mnt/sdc1/check" ]; then
+  gst-launch filesrc location=/mnt/sdc1/test.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! vpudec ! mfw_v4lsink demux. ! queue max-size-buffers=0 max-size-time=0 ! beepdec ! audioconvert ! 'audio/x-raw-int, channels=2' ! alsasink
+elif  [ -d "/mnt/sdd1/check" ]; then
+  gst-launch filesrc location=/mnt/sdd1/test.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! vpudec ! mfw_v4lsink demux. ! queue max-size-buffers=0 max-size-time=0 ! beepdec ! audioconvert ! 'audio/x-raw-int, channels=2' ! alsasink
+elif  [ -d "/mnt/sde1/check" ]; then
+  gst-launch filesrc location=/mnt/sde1/test.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! vpudec ! mfw_v4lsink demux. ! queue max-size-buffers=0 max-size-time=0 ! beepdec ! audioconvert ! 'audio/x-raw-int, channels=2' ! alsasink
+elif  [ -d "/mnt/sdf1/check" ]; then
+  gst-launch filesrc location=/mnt/sdf1/test.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! vpudec ! mfw_v4lsink demux. ! queue max-size-buffers=0 max-size-time=0 ! beepdec ! audioconvert ! 'audio/x-raw-int, channels=2' ! alsasink
+elif  [ -d "/mnt/sdg1/check" ]; then
+  gst-launch filesrc location=/mnt/sdg1/test.mp4 typefind=true ! aiurdemux name=demux demux. ! queue max-size-buffers=0 max-size-time=0 ! vpudec ! mfw_v4lsink demux. ! queue max-size-buffers=0 max-size-time=0 ! beepdec ! audioconvert ! 'audio/x-raw-int, channels=2' ! alsasink
 else
-  echo "Did not find test.mp4" >> ${LOGFILE}
-  /jci/tools/jci-dialog --title="Video Playback Error" --text="Unable to play video" --ok-label='OK' --no-cancel &
+  /jci/tools/jci-dialog --title="Video" --text="Unable to play video" --ok-label='OK' --no-cancel &
 fi
 
-echo "Sleeping for 10" >> ${LOGFILE}
 sleep 10
 
-echo "Killing dialog box" >> ${LOGFILE}
 killall jci-dialog
