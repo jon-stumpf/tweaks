@@ -14,88 +14,96 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-JCI_DIR="/jci"
-JCI_BIN="${JCI_DIR}/tools"
-
-PATH="${JCI_BIN}:${PATH}"
-export PATH
-
-PROGRAM="SysInfo"
-PROG_DESC="System Information"
+########################################
+# Begin Program
+#
 
 TIMESTAMP="$(date '+%Y%m%dT%H%M%S')"
 CURR_DIR="$(dirname $(readlink -f ${0}))"
 DATA_DIR="${CURR_DIR}/data-${TIMESTAMP}"
 
-log_message()
-{
-    MESSAGE="${*}"
-
-    echo "${MESSAGE}"
-
-    jci-dialog \
-	--title="${PROG_DESC}" \
-	--text="${MESSAGE}" \
-	--ok-label='OK' \
-	--no-cancel &
-}
-
+##########
+# Create directory to hold information
+#
 mkdir "${DATA_DIR}"
 
-if [ -d "${DATA_DIR}" ]
+if [ ! -d "${DATA_DIR}" ]
 then
-    exec 1> "${DATA_DIR}/stdout.log" 2> "${DATA_DIR}/stderr.log"
-
-    echo "${0}: ${@}"
-    echo ""
-    echo "${CURR_DIR}: current directory"
-    echo "${DATA_DIR}: data directory"
-    echo ""
-
-    cd "${DATA_DIR}"
-
-    id > id.out
-    cp /etc/passwd > passwd
-    cp /etc/group > group
-    ls /etc > etc.ls
-
-    env > env.out
-
-    uname -a > uname.out
-
-    for i in cpuinfo cmdline version version_signature
-    do
-    	cp "/proc/${i}" .
-    done
-
-    lsmod > lsmod.out
-
-    lshw -quiet -html > lshw.html
-    lshw -quiet > lshw.out
-
-    lspci -t -vv -nn > lspci.out
-    lsusb -t -v > lsusb.out
-
-    mount > mount.out
-    df > df.out
-
-    cp /boot/grub/grub.cfg .
-
-    lsof -iTCP -n > lsof.out
-
-    ps --forest -F -H -e > ps.out
-
-    find / \( -name \*.pem -o -name \*.pem -o -name id_rsa \) -ls > keys.list
-
-    tar cjf etc.tbz2 /etc
-    tar cjf jci.tbz2 "${JCI_DIR}"
-
-    log_message "Information captured.  Remove USB."
-else    
-    log_message "${DATA_DIR}: could not create directory."
+	exit 1
 fi
 
-sleep 5
+# The thing it is expecting before we capture all output
+cat "/jci/version.ini"
 
-killall jci-dialog
+# Capture all standard output and error
+exec 1> "${DATA_DIR}/stdout.log" 2> "${DATA_DIR}/stderr.log"
+
+echo "${0}: ${@}"
+echo ""
+echo "${PWD}: present working directory"
+echo "${CURR_DIR}: current directory"
+echo "${DATA_DIR}: data directory"
+echo ""
+
+cd "${DATA_DIR}"
+
+id > id.out
+cp /etc/passwd /etc/group .
+
+env > env.out
+
+uname -a > uname.out
+
+for i in cpuinfo cmdline version # version_signature
+do
+	cp "/proc/${i}" .
+done
+
+ls -la / > ls-root.out
+
+for i in bin sbin lib dev usr var
+do
+	ls -la "/${i}/." > "ls-${i}.out"
+done
+
+ls -laR /proc/[a-zA-Z]* > lsR-proc.out
+ls -laR /sys > lsR-sys.out
+
+lsmod > lsmod.out
+
+# lshw -quiet -html > lshw.html
+# lshw -quiet > lshw.out
+
+# lspci -t -vv -nn > lspci.out
+lspci -m -k > lspci.out
+lsusb -v -t > lsusb.out
+
+for i in ffx01 mmcblk0
+do
+	fdisk -l "/dev/${i}" > "fdisk-${i}.out"
+done
+
+fxinfo > fxinfo.out
+
+mount > mount.out
+df > df.out
+
+# cp /boot/grub/grub.cfg .
+
+ifconfig > ifconfig.out
+
+# lsof -iTCP -n > lsof.out
+
+ps -T > ps.out
+
+find / \( -name \*.pem -o -name id_rsa \) -print > keys.list
+
+for i in etc jci bootchart data data_persist config config-mfg resources
+do
+	tar czf "${i}.tgz" "/${i}"
+done
+
+(cd /sys/class/nvram/nv-config/keys; for i in *; do echo -n "${i}: "; cat "${i}"; done;) > nvram-keys.out
+
+exit 0
 
